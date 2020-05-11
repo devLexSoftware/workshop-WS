@@ -77,9 +77,9 @@ $db['default'] = array
 (
 	'dsn'	=> '',
 	'hostname' => 'localhost',
-	'username' => 'root',
+	'username' => 'ubuntu',
 	'password' => 'q1w2e3',
-	'database' => 'workshopstudio',
+	'database' => 'workshopstudioLive',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

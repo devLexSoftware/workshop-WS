@@ -4,6 +4,8 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Obra_model extends CI_Model
 {
   private $tabla = "obras";
+  private $view = "vw_info_obras";
+  
 
   function __construct()
   {
@@ -47,4 +49,78 @@ class Obra_model extends CI_Model
       { return $queryResult->result_array(); }
     }
   }
+
+  public function select_vw_info_obras($json = false)
+  {
+    $this->db->order_by("fechInicio_obra", "DESC");
+    $this->db->where('estado',0);
+
+    $queryResult = $this->db->get($this->view);
+    // error_log($this->db->last_query());
+
+    if (!$queryResult)
+    {
+      error_log("ERROR SELECT VW_INFO_OBRAS");
+      return false;
+    }
+    else
+    {
+      if ($json)
+      { return json_encode($queryResult->result()); }
+      else
+      { return $queryResult->result_array(); }
+    }
+  }
+
+  public function registrar_obra($data)
+  {
+    error_log("REGISTRAR OBRA");
+
+    if ($this->db->insert('obras', $data))
+    {
+      error_log("INSERT OBRA: ".$this->db->last_query());
+      return true;
+    }
+    else
+    {
+      error_log("INSERT OBRA: ".$this->db->last_query());
+      return false;
+    }
+  }
+
+  public function actualizar_obra($data)
+  {
+    error_log("ACTUALIZAR OBRA");
+    $this->db->where('id',$data["id"]);
+
+    if ($this->db->update('obras', $data))
+    {
+      error_log("UPDATE OBRA: ".$this->db->last_query());
+      return true;
+    }
+    else
+    {
+      error_log("UPDATE OBRA: ".$this->db->last_query());
+      return false;
+    }
+  }
+
+  public function eliminar_obra($data)
+  {
+    error_log("BORRAR OBRA");    
+
+    $this->db->where('id', $data["id"]);
+
+    if ($this->db->update('obras', $data))
+    {
+      error_log("UPDATE OBRA: ".$this->db->last_query());
+      return true;
+    }
+    else
+    {
+      error_log("UPDATE OBRA: ".$this->db->last_query());
+      return false;
+    }
+  }
+
 }

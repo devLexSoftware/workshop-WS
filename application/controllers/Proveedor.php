@@ -85,4 +85,119 @@ class Proveedor extends REST_Controller
 
     $this->response($respuesta);
   }
+
+  public function registrar_modificar_proveedor_post()
+  {
+    error_log("WS Registar Cliente");
+
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    // error_log("clienteId: ".$data['clienteId']);
+    // error_log("obraId: ".$data["obraId"]);
+    // error_log("imgn: ".$data['imgn']);
+    // error_log("PeriodoI: ".$data["periodoInicial"]);
+    // error_log("PeriodoF: ".$data["periodoFinal"]);
+
+
+    if($data["id_proveedor"] != null)
+    {
+      $dataInsert = array(
+        "fechCreacion" => date("Y-m-d H:is"),
+        "fechCreado" => date("Y-m-d H:is"),
+        "usuCreacion" => "Móvil",
+        "id" => $data["id_proveedor"],
+        "identificador" => $data["identificador"],
+        "empresa" => $data["empresa"],
+        "proveedor" => $data["proveedor"],
+        "descripcion" => $data["descripcion"],
+        "rfc" => $data["rfc"],
+        "importe" => $data["importe"],
+        "unidad" => $data["unidad"],
+        "contacto1" => $data["contacto1"],
+        "contacto2" => $data["contacto2"],
+        "email" => $data["email"],
+        "direccion" => $data["direccion"],
+        "comentario" => $data["comentario"],
+        "estado" => 0
+      );
+  
+      if ($this->Proveedor_model->actualizar_proveedor($dataInsert))
+      {
+        error_log("Proveedor Registrado");
+        $respuesta = array('error' => FALSE, 'msj' => "Proveedor Registrado");
+      }
+      else
+      {
+        error_log("Proveedor NO Registrado");
+        $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+      }
+  
+      $this->response($respuesta);
+    }
+    else
+    {
+      $dataInsert = array(
+        "fechCreacion" => date("Y-m-d H:is"),
+        "fechCreado" => date("Y-m-d H:is"),
+        "usuCreacion" => "Móvil",
+        "id" => NULL,
+        "identificador" => $data["identificador"],
+        "empresa" => $data["empresa"],
+        "proveedor" => $data["proveedor"],
+        "descripcion" => $data["descripcion"],
+        "rfc" => $data["rfc"],
+        "importe" => $data["importe"],
+        "unidad" => $data["unidad"],
+        "contacto1" => $data["contacto1"],
+        "contacto2" => $data["contacto2"],
+        "email" => $data["email"],
+        "direccion" => $data["direccion"],
+        "comentario" => $data["comentario"],
+        "estado" => 0
+      );
+  
+      if ($this->Proveedor_model->registrar_proveedor($dataInsert))
+      {
+        error_log("Proveedor Registrado");
+        $respuesta = array('error' => FALSE, 'msj' => "Proveedor Registrado");
+      }
+      else
+      {
+        error_log("Proveedor NO Registrado");
+        $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+      }
+  
+      $this->response($respuesta);
+    }
+  }
+
+  public function eliminar_proveedor_post()
+  {       
+    
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    error_log("WS Proveedor Eliminar");    
+
+    if ($data['id'] != null)
+    {
+
+      $result = $this->Proveedor_model->eliminar_proveedor($data);
+
+      if ($result == true)
+      {
+        $respuesta = array('error' => FALSE, 'data' => $result);
+        $this->response($respuesta);
+      }
+      else
+      {
+        $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+        $this->response($respuesta);
+      }
+    }
+    else
+    {
+      $respuesta = array('error' => TRUE, 'msj' => "No fue posible recuperar listado de Obras por Cliente (Campos incompletos)!");
+      $this->response($respuesta);
+    }
+  }
 }

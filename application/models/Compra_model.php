@@ -33,6 +33,7 @@ class Compra_model extends CI_Model
   public function select_vw_info_compras($json = false)
   {
     $this->db->order_by("fecha_compra", "DESC");
+    $this->db->where('estado_compra',0);
     $queryResult = $this->db->get($this->view);
     // error_log($this->db->last_query());
 
@@ -61,6 +62,24 @@ class Compra_model extends CI_Model
     else
     {
       error_log("INSERT COMPRAS: ".$this->db->last_query());
+      return false;
+    }
+  }
+
+  public function eliminar_compra($data)
+  {
+    error_log("BORRAR COMPRA");    
+
+    $this->db->where('id', $data["id"]);
+
+    if ($this->db->update('compras', $data))
+    {
+      error_log("UPDATE COMPRA: ".$this->db->last_query());
+      return true;
+    }
+    else
+    {
+      error_log("UPDATE COMPRA: ".$this->db->last_query());
       return false;
     }
   }

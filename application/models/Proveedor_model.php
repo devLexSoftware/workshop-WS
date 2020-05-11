@@ -12,6 +12,8 @@ class Proveedor_model extends CI_Model
 
   public function select($json = false)
   {
+    $this->db->where('estado',0);
+
     $queryResult = $this->db->get($this->tabla);
     error_log($this->db->last_query());
 
@@ -39,6 +41,41 @@ class Proveedor_model extends CI_Model
     else
     {
       error_log("INSERT PROVEEDOR: ".$this->db->last_query());
+      return false;
+    }
+  }
+
+  public function actualizar_proveedor($data)
+  {
+    error_log("ACTUALIZAR PROVEEDOR");
+    $this->db->where('id',$data["id"]);
+
+    if ($this->db->update($this->tabla, $data))
+    {
+      error_log("UPDATE CLIENTE: ".$this->db->last_query());
+      return true;
+    }
+    else
+    {
+      error_log("UPDATE CLIENTE: ".$this->db->last_query());
+      return false;
+    }
+  }
+
+  public function eliminar_proveedor($data)
+  {
+    error_log("BORRAR PROVEEDOR");    
+
+    $this->db->where('id', $data["id"]);
+
+    if ($this->db->update($this->tabla, $data))
+    {
+      error_log("UPDATE PROVEEDOR: ".$this->db->last_query());
+      return true;
+    }
+    else
+    {
+      error_log("UPDATE PROVEEDOR: ".$this->db->last_query());
       return false;
     }
   }

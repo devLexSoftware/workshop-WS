@@ -12,6 +12,9 @@ class Cliente_model extends CI_Model
 
   public function select($json = false)
   {
+
+    $this->db->where('estado',0);
+
     $queryResult = $this->db->get($this->tabla);
     error_log($this->db->last_query());
 
@@ -41,6 +44,41 @@ class Cliente_model extends CI_Model
     else
     {
       error_log("INSERT CLIENTE: ".$this->db->last_query());
+      return false;
+    }
+  }
+
+  public function actualizar_cliente($data)
+  {
+    error_log("ACTUALIZAR CLIENTE");
+    $this->db->where('id',$data["id"]);
+
+    if ($this->db->update('clientes', $data))
+    {
+      error_log("UPDATE CLIENTE: ".$this->db->last_query());
+      return true;
+    }
+    else
+    {
+      error_log("UPDATE CLIENTE: ".$this->db->last_query());
+      return false;
+    }
+  }
+
+  public function eliminar_cliente($data)
+  {
+    error_log("BORRAR CLIENTE");    
+
+    $this->db->where('id', $data["id"]);
+
+    if ($this->db->update('clientes', $data))
+    {
+      error_log("UPDATE CLIENTE: ".$this->db->last_query());
+      return true;
+    }
+    else
+    {
+      error_log("UPDATE CLIENTE: ".$this->db->last_query());
       return false;
     }
   }

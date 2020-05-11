@@ -1,10 +1,10 @@
 <?php
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Cotizacion_model extends CI_Model
+class Pedido_model extends CI_Model
 {
-  private $tabla = "cotizaciones";
-  private $view = "vw_info_cotizaciones";
+  private $tabla = "pedidos";
+  // private $view = "vw_info_pedidos";
 
   function __construct()
   {
@@ -18,7 +18,7 @@ class Cotizacion_model extends CI_Model
 
     if (!$queryResult)
     {
-      error_log("ERROR SELECT COTIZACIONES");
+      error_log("ERROR SELECT PEDIDOS");
       return false;
     }
     else
@@ -30,22 +30,21 @@ class Cotizacion_model extends CI_Model
     }
   }
 
-  public function vw_info_cotizaciones_select($json = false)
+  public function registrar_pedido($data)
   {
-    $queryResult = $this->db->get($this->view);
-    error_log($this->db->last_query());
-
-    if (!$queryResult)
+    error_log("REGISTRAR PEDIDO");
+    if ($this->db->insert($this->tabla, $data))
     {
-      error_log("ERROR SELECT VW_INFO_COTIZACIONES");
-      return false;
+      error_log("INSERT PEDIDO: ".$this->db->last_query());
+      return true;
     }
     else
     {
-      if ($json)
-      { return json_encode($queryResult->result()); }
-      else
-      { return $queryResult->result_array(); }
+      error_log("INSERT PEDIDO: ".$this->db->last_query());
+      return false;
     }
   }
+
+
+  
 }

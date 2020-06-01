@@ -67,7 +67,17 @@ class Cliente extends REST_Controller
       "estado" => 0,
     );
 
-    if ($this->Cliente_model->registrar_cliente($dataInsert))
+    $dataInsert2 = array(
+      "fechCreacion" => date("Y-m-d H:is"),
+      "fechCreado" => date("Y-m-d H:is"),
+      "usuCreacion" => "Móvil",
+      "id" => NULL,
+      "usuario" => $data["email"],
+      "pass" => $data["movil"],
+      "perfil" => "cliente",
+    );
+
+    if ($this->Cliente_model->registrar_cliente($dataInsert, $dataInsert2))
     {
       error_log("Cliente Registrado");
       $respuesta = array('error' => FALSE, 'msj' => "Cliente Registrado");
@@ -119,6 +129,7 @@ class Cliente extends REST_Controller
         "nota" => $data["nota"],
         "estado" => 0,
       );
+      
 
       if ($this->Cliente_model->actualizar_cliente($dataInsert))
       {
@@ -157,6 +168,8 @@ class Cliente extends REST_Controller
         "nota" => $data["nota"],
         "estado" => 0,
       );
+
+      
 
       if ($this->Cliente_model->registrar_cliente($dataInsert))
       {

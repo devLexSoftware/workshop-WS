@@ -189,4 +189,34 @@ class Obra extends REST_Controller
     }
   }
 
+  public function select_obras_empleado_post()
+    {
+      $data = $this->input->post();
+
+      error_log("WS Obras Campo Especifico");
+      error_log("Campo: ".$data['campo']);
+      error_log("Valor: ".$data['valor']);
+
+      if(isset($data['campo']) && isset($data['valor']))
+      {
+        $data = $this->Obra_model->select_obras_empleado(false, $data['valor']);
+  
+        if (count($data) >= 0)
+        {
+          $respuesta = array('error' => FALSE, 'data' => $data);
+          $this->response($respuesta);
+        }
+        else
+        {
+          $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+          $this->response($respuesta);
+        }
+      }
+      else
+      {
+        $respuesta = array('error' => TRUE, 'msj' => "No fue posible recuperar listado de Obras por Cliente (Campos incompletos)!");
+        $this->response($respuesta);
+      }
+    }
+
 }

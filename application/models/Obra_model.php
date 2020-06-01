@@ -123,4 +123,30 @@ class Obra_model extends CI_Model
     }
   }
 
+  public function select_obras_empleado($json = false, $params)
+  {
+    $this->db->select('o.id as id_obra, o.identificador as identificador_obra, o.nombre, o.fk_grupo');
+    $this->db->from('obras o');    
+    $this->db->join('grupos_empleados ge', 'ge.fk_grupo = o.fk_grupo');
+    $this->db->where('ge.fk_empleado', $params);
+
+    $queryResult = $this->db->get();
+
+    // $queryResult = $this->db->get_where($this->tabla, $params);
+    // error_log($this->db->last_query());
+
+    if (!$queryResult)
+    {
+      error_log("ERROR SELECT OBRAS CAMPO ESPECIFICO");
+      return false;
+    }
+    else
+    {
+      if ($json)
+      { return json_encode($queryResult->result()); }
+      else
+      { return $queryResult->result_array(); }
+    }
+  }
+
 }

@@ -4,6 +4,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Cliente_model extends CI_Model
 {
   private $tabla = "clientes";
+  private $tabla2 = "users";
 
   function __construct()
   {
@@ -39,6 +40,22 @@ class Cliente_model extends CI_Model
     if ($this->db->insert('clientes', $data))
     {
       error_log("INSERT CLIENTE: ".$this->db->last_query());
+
+      $insert_id = $this->db->insert_id();
+
+      $data2 = array(
+        "fechCreacion" => NULL,
+        "fechCreado" => NULL,
+        "usuCreacion" => "Móvil",
+        "id" => NULL,
+        "usuario" => $data["email"],
+        "pass" => $data["movil"],
+        "perfil" => "cliente",
+        "fk_vinculada" => $insert_id
+      );
+
+      $result = $this->registrar_user($data2);
+
       return true;
     }
     else
@@ -79,6 +96,24 @@ class Cliente_model extends CI_Model
     else
     {
       error_log("UPDATE CLIENTE: ".$this->db->last_query());
+      return false;
+    }
+  }
+
+
+  public function registrar_user($data)
+  {
+    error_log("REGISTRAR USER");
+
+    if ($this->db->insert($this->tabla2, $data))
+    {
+      error_log("INSERT USER: ".$this->db->last_query());      
+
+      return true;
+    }
+    else
+    {
+      error_log("INSERT USER: ".$this->db->last_query());
       return false;
     }
   }

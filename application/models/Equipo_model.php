@@ -5,7 +5,10 @@ class Equipo_model extends CI_Model
 {
     private $tabla = "grupos";
     private $tablaJoin = "grupos_empleados";
+    private $tablaJoin2 = "grupos_contratistas";
     private $view = "vw_info_grupos";    
+    private $viewEm = "vw_info_gruposEmpleados";    
+    private $viewCo = "vw_info_gruposContratistas";    
 
 
     function __construct()
@@ -55,7 +58,7 @@ class Equipo_model extends CI_Model
         }
     }
 
-    public function registrar_equipo($data, $empleados)
+    public function registrar_equipo($data, $empleados, $contratistas)
     {
         error_log("REGISTRAR EQUIPO");
 
@@ -84,6 +87,26 @@ class Equipo_model extends CI_Model
                 }
             }
 
+            if($insert_id != null && count($contratistas) > 0)
+            {
+
+                //---Borrar
+                $result = $this->borrar_contratistas($data["id"]);
+
+                foreach ($contratistas as $key => $value) 
+                {
+                    $dataContratista = array(
+                        "usuCreacion" => "Móvil",
+                        "id" => null,
+                        "fk_grupo" => $insert_id,
+                        "fk_contratista" => $value,
+                        "estado"=>0,
+                    );
+                    $this->db->insert($this->tablaJoin2, $dataContratista);
+
+                }
+            }
+
             return true;
         }
         else
@@ -93,7 +116,7 @@ class Equipo_model extends CI_Model
         }
     }
 
-    public function actualizar_equipo($data, $empleados)
+    public function actualizar_equipo($data, $empleados, $contratistas)
     {
         error_log("ACTUALIZAR EQUIPO");
         $this->db->where('id',$data["id"]);
@@ -121,6 +144,26 @@ class Equipo_model extends CI_Model
                 }
             }
 
+            if(count($contratistas) > 0)
+            {
+
+                //---Borrar
+                $result = $this->borrar_contratistas($data["id"]);
+
+                foreach ($contratistas as $key => $value) 
+                {
+                    $dataContratista = array(
+                        "usuCreacion" => "Movil",
+                        "id" => null,
+                        "fk_grupo" => $data["id"],
+                        "fk_contratista" => $value,
+                        "estado"=>0,
+                    );
+                    $this->db->insert($this->tablaJoin2, $dataContratista);
+
+                }
+            }
+
             return true;
         }
         else
@@ -144,6 +187,23 @@ class Equipo_model extends CI_Model
         else
         {
             error_log("DELETE EMPLEADOS: ".$this->db->last_query());
+            return false;
+        }
+    }
+
+    public function borrar_contratistas($id)
+    {
+        error_log("BORRAR CONTRATISTAS");
+        $this->db->where('fk_grupo', $id);
+
+        if ($this->db->delete($this->tablaJoin2))
+        {
+            error_log("DELETE CONTRATISTAS: ".$this->db->last_query());            
+            return true;
+        }
+        else
+        {
+            error_log("DELETE CONTRATISTAS: ".$this->db->last_query());
             return false;
         }
     }
@@ -200,6 +260,45 @@ class Equipo_model extends CI_Model
         }
     }
 
+    public function select_vw_info_equiposEmpleados($json, $campo, $valor)
+    {
+        $this->db->where($campo,$valor);                
+    
+        $queryResult = $this->db->get($this->viewEm);        
+    
+        if (!$queryResult)
+        {
+          error_log("ERROR SELECT VW_INFO_EMPLEADOS");
+          return false;
+        }
+        else
+        {
+          if ($json)
+          { return json_encode($queryResult->result()); }
+          else
+          { return $queryResult->result_array(); }
+        }
+    }
+
+    public function select_vw_info_equiposContratistas($json, $campo, $valor)
+    {
+        $this->db->where($campo,$valor);                
+    
+        $queryResult = $this->db->get($this->viewCo);        
+    
+        if (!$queryResult)
+        {
+          error_log("ERROR SELECT VW_INFO_CONTRATISTAS");
+          return false;
+        }
+        else
+        {
+          if ($json)
+          { return json_encode($queryResult->result()); }
+          else
+          { return $queryResult->result_array(); }
+        }
+    }
 
 
 }

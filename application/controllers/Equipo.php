@@ -52,6 +52,42 @@ class Equipo extends REST_Controller
       } 
     }
 
+    public function vw_info_gruposEmpleados_campo_especifico_post()
+    {
+      $data = json_decode(file_get_contents('php://input'), true);
+
+      $data = $this->Equipo_model->select_vw_info_equiposEmpleados(false, $data['campo'], $data['valor']);
+
+      if (count($data) >= 0)
+      {
+        $respuesta = array('error' => FALSE, 'data' => $data);
+        $this->response($respuesta);
+      }
+      else
+      {
+        $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+        $this->response($respuesta);
+      } 
+    }
+
+    public function vw_info_gruposContratistas_campo_especifico_post()
+    {
+      $data = json_decode(file_get_contents('php://input'), true);
+
+      $data = $this->Equipo_model->select_vw_info_equiposContratistas(false, $data['campo'], $data['valor']);
+
+      if (count($data) >= 0)
+      {
+        $respuesta = array('error' => FALSE, 'data' => $data);
+        $this->response($respuesta);
+      }
+      else
+      {
+        $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+        $this->response($respuesta);
+      } 
+    }
+
 
 
 
@@ -71,7 +107,7 @@ class Equipo extends REST_Controller
         );
                 
           
-        if ($this->Equipo_model->actualizar_equipo($dataInsert, $data["empleadosId"]))
+        if ($this->Equipo_model->actualizar_equipo($dataInsert, $data["empleadosId"], $data["contratistasId"]))
         {
           error_log("Equipo Actualizado");
           $respuesta = array('error' => FALSE, 'msj' => "Equipo Registrado");
@@ -91,7 +127,7 @@ class Equipo extends REST_Controller
           "estado"=>0,
         );
 
-        if ($this->Equipo_model->registrar_equipo($dataInsert, $data["empleadosId"]))
+        if ($this->Equipo_model->registrar_equipo($dataInsert, $data["empleadosId"], $data["contratistasId"]))
         {
           error_log("Equipo Actualizado");
           $respuesta = array('error' => FALSE, 'msj' => "Equipo Registrado");

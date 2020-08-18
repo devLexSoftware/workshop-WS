@@ -33,76 +33,68 @@ class Pedido extends REST_Controller
             $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
             $this->response($respuesta);
         }
-    }
+    }    
 
-    
-
-    public function registrar_pedido_post()
+    public function registrar_modificar_pedido_post()
     {
       error_log("WS Registar Pedido");
 
       $data = json_decode(file_get_contents('php://input'), true);
       
-      error_log("obraId: ".$data["fk_obra"]);    
+      // error_log("obraId: ".$data["fk_obra"]);    
 
-      if($data["id"] == null)
+      if($data["id"] != null)
       {
-
-      }
-
-      $dataInsert = array(
-        "fechCreacion" => date("Y-m-d H:i:s"),
-        "fechCreado" => date("Y-m-d H:i:s"),
-        "usuCreacion" => "Movíl",
-        "id" => NULL,
-        "identificador" => NULL,
-        "descripcion" => $data["descripcion"],      
-        "frente" => $data["frente"],      
-        "fk_obra" => $data['fk_obra'],      
-        "estado" => $data['estatus'],      
-        "estatus" => 0,      
-      );
-
-      if ($this->Pedido_model->registrar_pedido($dataInsert))
-      {
-        error_log("Pedido Registrado");
-        $respuesta = array('error' => FALSE, 'msj' => "Pedido Registrado");
-      }
-      else
-      {
-        error_log("Pedido NO Registrada");
-        $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
-      }
-
-      $this->response($respuesta);
-    }
-
-    public function registrar_modificar_pedido_post()
-    {
-
-      error_log("WS Registar Cliente");
-
-      $data = json_decode(file_get_contents('php://input'), true);
-
-      $dataUpdate = array(        
-        "usuCreacion" => "Admin",
-        "id" => $data['id'],
-        "estado" => $data['estado']
-      );
-
-      if ($this->Pedido_model->actualizar_pedido($dataUpdate))
-      {
-        error_log("Pedido Actualizado");
-        $respuesta = array('error' => FALSE, 'msj' => "Se cambio el estatus de pedido");
+        $dataInsert = array(          
+          "usuCreacion" => "Movíl",
+          "id" => $data["id"],      
+          "identificador" => $data["identificador"],      
+          "descripcion" => $data["descripcion"],      
+          "frente" => $data["frente"],      
+          "fk_obra" => $data['fk_obra'],      
+          "estado" => $data['estado'],      
+          "estatus" => 0,      
+        );
+        if ($this->Pedido_model->actualizar_pedido($dataInsert))
+        {
+          error_log("Pedido Actualizado");
+          $respuesta = array('error' => FALSE, 'msj' => "Pedido Actualizado");
+        }
+        else
+        {
+          error_log("Pedido NO Actualizado");
+          $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+        }
       }
       else
       {
-        error_log("Pedido NO Actualizado");
-        $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
-      }
-      $this->response($respuesta);
+        $dataInsert = array(          
+          "fechCreacion" => date("Y-m-d H:i:s"),
+          "fechCreado" => date("Y-m-d H:i:s"),
+          "usuCreacion" => "Movíl",
+          "id" => NULL,      
+          "identificador" => $data["identificador"],      
+          "descripcion" => $data["descripcion"],      
+          "frente" => $data["frente"],      
+          "fk_obra" => $data['fk_obra'],      
+          "estado" => $data['estado'],      
+          "estatus" => 0,  
+        );
 
-    }
+        if ($this->Pedido_model->registrar_pedido($dataInsert))
+        {
+          error_log("Pedido Registrado");
+          $respuesta = array('error' => FALSE, 'msj' => "Se Registro el Pedido");
+        }
+        else
+        {
+          error_log("Pedido NO Registrado");
+          $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+        }
+      }
+
+      $this->response($respuesta);
+    }    
 
     public function campo_especifico_post()
     {
@@ -114,7 +106,7 @@ class Pedido extends REST_Controller
 
       if(isset($data['campo']) && isset($data['valor']))
       {
-        $data = $this->Pedido_model->campo_especifico(false, $data);
+        $data = $this->Pedido_model->campo_especifico(false, array($data['campo'] => $data['valor']));
   
         if (count($data) >= 0)
         {
@@ -129,10 +121,26 @@ class Pedido extends REST_Controller
       }
       else
       {
-        $respuesta = array('error' => TRUE, 'msj' => "No fue posible recuperar listado de Obras por Cliente (Campos incompletos)!");
+        $respuesta = array('error' => TRUE, 'msj' => "No fue posible recuperar el listado de pedidos (Campos incompletos)!");
         $this->response($respuesta);
       }
     }    
+
+    public function select_pedidos_obras_get()
+    {
+      $data = $this->Pedido_model->select_pedidos_obras(false);
+    
+      if (count($data) >= 0)
+      {
+          $respuesta = array('error' => FALSE, 'data' => $data);
+          $this->response($respuesta);
+      }
+      else
+      {
+          $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+          $this->response($respuesta);
+      }
+    }
 
 
 

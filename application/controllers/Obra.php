@@ -105,6 +105,10 @@ class Obra extends REST_Controller
         "fk_clientes" => $data["fk_clientes"],
         "fk_grupo" => $data["fk_grupo"],
         "estado"=>0,
+        "costoTotal" => $data["costo"],
+        "porcentajeGanancia" => $data["porcentaje"],
+        "superficie" => $data["superficieTotal"],
+        "superficieConstruir" => $data["superficieConstruir"]
       );
 
       if ($this->Obra_model->actualizar_obra($dataInsert))
@@ -141,6 +145,10 @@ class Obra extends REST_Controller
         "fk_clientes" => $data["fk_clientes"],
         "fk_grupo" => $data["fk_grupo"],
         "estado" => 0,
+        "costoTotal" => $data["costo"],
+        "porcentajeGanancia" => $data["porcentaje"],
+        "superficie" => $data["superficieTotal"],
+        "superficieConstruir" => $data["superficieConstruir"]
       );
 
       if ($this->Obra_model->registrar_obra($dataInsert))

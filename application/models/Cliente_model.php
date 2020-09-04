@@ -43,18 +43,18 @@ class Cliente_model extends CI_Model
 
       $insert_id = $this->db->insert_id();
 
-      $data2 = array(
-        "fechCreacion" => NULL,
-        "fechCreado" => NULL,
-        "usuCreacion" => "Móvil",
-        "id" => NULL,
-        "usuario" => $data["email"],
-        "pass" => $data["movil"],
-        "perfil" => "cliente",
-        "fk_vinculada" => $insert_id
-      );
+      // $data2 = array(
+      //   "fechCreacion" => NULL,
+      //   "fechCreado" => NULL,
+      //   "usuCreacion" => "Móvil",
+      //   "id" => NULL,
+      //   "usuario" => $data["email"],
+      //   "pass" => $data["movil"],
+      //   "perfil" => "cliente",
+      //   "fk_vinculada" => $insert_id
+      // );
 
-      $result = $this->registrar_user($data2);
+      // $result = $this->registrar_user($data2);
 
       return true;
     }

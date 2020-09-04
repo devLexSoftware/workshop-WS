@@ -208,18 +208,18 @@ class Equipo_model extends CI_Model
         }
     }
 
-    public function eliminar_equipo($id)
+    public function eliminar_equipo($data)
     {
 
         //--Cambiar fk_grupo por default
-        $borrar = $this->cambiar_equipo_obra($id);
+        // $borrar = $this->cambiar_equipo_obra($id);
 
-        if($borrar == true)
-        {
-            $result = $this->borrar_empleados($id);
+        
+            // $result = $this->borrar_empleados($id);
             error_log("BORRAR EQUIPOS");
-            $this->db->where('id', $id);        
-            if ($this->db->delete($this->tabla))
+            $this->db->where('id', $data["id"]);        
+            // if ($this->db->delete($this->tabla))
+            if ($this->db->update('grupos', $data))
             {            
                 error_log("DELETE EMPLEADOS: ".$this->db->last_query());            
                 return true;
@@ -229,13 +229,7 @@ class Equipo_model extends CI_Model
                 error_log("DELETE EMPLEADOS: ".$this->db->last_query());
                 return false;
             }
-        }
-        else
-        {
-            error_log("DELETE EMPLEADOS: ".$this->db->last_query());
-                return false;
-        }
-        
+
     }
 
     public function cambiar_equipo_obra($id)
@@ -245,7 +239,7 @@ class Equipo_model extends CI_Model
         $this->db->where('fk_grupo', $id);
 
         $data = array(
-            "fk_grupo" => "10",            
+            "fk_grupo" => "14",            
         );
 
         if ($this->db->update('obras', $data))

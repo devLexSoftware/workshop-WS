@@ -157,7 +157,7 @@ class Equipo extends REST_Controller
       if ($data['id'] != null)
       {
   
-        $result = $this->Equipo_model->eliminar_equipo($data['id']);
+        $result = $this->Equipo_model->eliminar_equipo($data);
   
         if ($result == true)
         {

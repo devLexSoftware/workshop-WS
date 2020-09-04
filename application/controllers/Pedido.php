@@ -53,7 +53,10 @@ class Pedido extends REST_Controller
           "frente" => $data["frente"],      
           "fk_obra" => $data['fk_obra'],      
           "estado" => $data['estado'],      
-          "estatus" => 0,      
+          "estatus" => 0, 
+          "fotoEntregado" => $data['foto_entregado'],      
+          "fotoPedido" => $data['foto_pedido'],      
+
         );
         if ($this->Pedido_model->actualizar_pedido($dataInsert))
         {
@@ -78,7 +81,9 @@ class Pedido extends REST_Controller
           "frente" => $data["frente"],      
           "fk_obra" => $data['fk_obra'],      
           "estado" => $data['estado'],      
-          "estatus" => 0,  
+          "estatus" => 0, 
+          "fotoEntregado" => $data['foto_entregado'],      
+          "fotoPedido" => $data['foto_pedido'],       
         );
 
         if ($this->Pedido_model->registrar_pedido($dataInsert))
@@ -106,7 +111,7 @@ class Pedido extends REST_Controller
 
       if(isset($data['campo']) && isset($data['valor']))
       {
-        $data = $this->Pedido_model->campo_especifico(false, array($data['campo'] => $data['valor']));
+        $data = $this->Pedido_model->campo_especifico(false, array($data['campo'] => $data['valor'], "estatus" => "0"));
   
         if (count($data) >= 0)
         {
@@ -142,6 +147,64 @@ class Pedido extends REST_Controller
       }
     }
 
+    public function historial_campo_especifico_post()
+    {
+      $data = $this->input->post();
 
+      error_log("WS Pedidos Campo Especifico");
+      error_log("Campo: ".$data['campo']);
+      error_log("Valor: ".$data['valor']);
+
+      if(isset($data['campo']) && isset($data['valor']))
+      {
+        $data = $this->Pedido_model->historial_campo_especifico(false, array($data['campo'] => $data['valor']));
+  
+        if (count($data) >= 0)
+        {
+          $respuesta = array('error' => FALSE, 'data' => $data);
+          $this->response($respuesta);
+        }
+        else
+        {
+          $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+          $this->response($respuesta);
+        }
+      }
+      else
+      {
+        $respuesta = array('error' => TRUE, 'msj' => "No fue posible recuperar el historial del pedido (Campos incompletos)!");
+        $this->response($respuesta);
+      }
+    }
+
+    public function eliminar_pedido_post()
+    {       
+      
+      $data = json_decode(file_get_contents('php://input'), true);
+
+      error_log("WS Pedido Eliminar");    
+
+      if ($data['id'] != null)
+      {
+
+        $result = $this->Pedido_model->eliminar_pedido($data);
+
+        if ($result == true)
+        {
+          $respuesta = array('error' => FALSE, 'data' => $result);
+          $this->response($respuesta);
+        }
+        else
+        {
+          $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+          $this->response($respuesta);
+        }
+      }
+      else
+      {
+        $respuesta = array('error' => TRUE, 'msj' => "No fue posible eliminar el pedido (Campos incompletos)!");
+        $this->response($respuesta);
+      }
+    }
 
 }

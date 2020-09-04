@@ -14,6 +14,7 @@ class Obra_model extends CI_Model
 
   public function select($json = false)
   {
+    $this->db->where('estado',0);
     $queryResult = $this->db->get($this->tabla);
     error_log($this->db->last_query());
 

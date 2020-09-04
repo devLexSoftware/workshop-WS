@@ -35,16 +35,14 @@ class Avance extends REST_Controller
         }
     }
 
-    public function campo_especifico_post()
+    public function dias_registrados_post()
     {
       $data = $this->input->post();
 
-      error_log("WS Avance Campo Especifico");      
-      error_log("fk_empleado: ".$data['fk_empleado']);
 
-      if(isset($data['fk_empleado']))
+      if(isset($data['fk_obra']))
       {
-        $data = $this->Avance_model->campo_especifico(false, $data);
+        $data = $this->Avance_model->dias_registrados(false, $data);
   
         if (count($data) >= 0)
         {
@@ -62,49 +60,202 @@ class Avance extends REST_Controller
         $respuesta = array('error' => TRUE, 'msj' => "No fue posible recuperar listado de Obras por Cliente (Campos incompletos)!");
         $this->response($respuesta);
       }
+    }
+
+    public function campo_especifico_post()
+    {
+      $data = $this->input->post();
+
+      error_log("WS Avance Campo Especifico");      
+      // error_log("fk_empleado: ".$data['fk_empleado']);
+
+      if(isset($data['campo']) && isset($data['valor']))
+      {
+        $data = $this->Avance_model->campo_especifico(false, array($data['campo'] => $data['valor']));
+  
+        if (count($data) >= 0)
+        {
+          $respuesta = array('error' => FALSE, 'data' => $data);
+          $this->response($respuesta);
+        }
+        else
+        {
+          $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+          $this->response($respuesta);
+        }
+      }
+      else
+      {
+        $respuesta = array('error' => TRUE, 'msj' => "No fue posible recuperar listado de Avances por Cliente (Campos incompletos)!");
+        $this->response($respuesta);
+      }
     }    
 
-  public function registrar_avance_post()
-  {
-    error_log("WS Registar Avance");
-
-    $data = json_decode(file_get_contents('php://input'), true);
-    
-    error_log("fk_obra: ".$data["fk_obra"]);    
-    error_log("PeriodoInicial: ".$data["periodoInicial"]);
-    error_log("PeriodoFinal: ".$data["periodoFinal"]);
-    error_log("Avance: ".$data["avance"]);
-    error_log("Semana: ".$data["semana"]);
-
-
-    $dataInsert = array(
-      "fechCreacion" => date("Y-m-d H:i:s"),
-      "fechCreado" => date("Y-m-d H:i:s"),
-      "usuCreacion" => "Movíl",
-      "id" => NULL,
-      "avance" => $data["avance"],
-      "semana" => $data["semana"],
-      "periodoInicial" => date_format(date_create($data["periodoInicial"]), 'Y-m-d H:i:s'),
-      "periodoFinal" => date_format(date_create($data["periodoFinal"]), 'Y-m-d H:i:s'),
-      "comentario" => $data["comentario"],
-      "fk_obra" => $data["fk_obra"]      
-    );        
-
-    if ($this->Avance_model->registrar_avance($dataInsert, $data["imagesArray"]))
+    public function registrar_avance_post()
     {
-      error_log("Avance Registrad");
-      $respuesta = array('error' => FALSE, 'msj' => "Avance Registrado");
+      error_log("WS Registar Avance");
+
+      $data = json_decode(file_get_contents('php://input'), true);
+      
+      error_log("fk_obra: ".$data["fk_obra"]);    
+      error_log("PeriodoInicial: ".$data["periodoInicial"]);
+      error_log("PeriodoFinal: ".$data["periodoFinal"]);
+      error_log("Avance: ".$data["avance"]);
+      error_log("Semana: ".$data["semana"]);
+
+
+      $dataInsert = array(
+        "fechCreacion" => date("Y-m-d H:i:s"),
+        "fechCreado" => date("Y-m-d H:i:s"),
+        "usuCreacion" => "Movíl",
+        "id" => NULL,
+        "avance" => $data["avance"],
+        "semana" => $data["semana"],
+        "periodoInicial" => date_format(date_create($data["periodoInicial"]), 'Y-m-d H:i:s'),
+        "periodoFinal" => date_format(date_create($data["periodoFinal"]), 'Y-m-d H:i:s'),
+        "comentario" => $data["comentario"],
+        "fk_obra" => $data["fk_obra"]      
+      );        
+
+      if ($this->Avance_model->registrar_avance($dataInsert, $data["imagesArray"]))
+      {
+        error_log("Avance Registrad");
+        $respuesta = array('error' => FALSE, 'msj' => "Avance Registrado");
+      }
+      else
+      {
+        error_log("Avance NO Registrado");
+        $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+      }
+
+      $this->response($respuesta);
     }
-    else
+
+    public function registrar_modificar_avance_post()
     {
-      error_log("Avance NO Registrado");
-      $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+      error_log("WS Registar Compra");
+
+      $data = json_decode(file_get_contents('php://input'), true);   
+
+      if($data["id_avance"] != null)
+      {
+        $dataInsert = array(          
+          "usuCreacion" => "Movíl",
+          "id" => $data["id_avance"],
+          "avance" => NULL,
+          "semana" => $data["semana"],
+          "periodoInicial" => $data["fechInicial"],
+          // "periodoInicial" => date_format(date_create($data["periodoInicial"]), 'Y-m-d H:i:s'),
+          // "periodoFinal" => date_format(date_create($data["periodoFinal"]), 'Y-m-d H:i:s'),
+          "periodoFinal" => $data["fechFinal"],
+          "comentario" => $data["descripcion"],
+          "fk_obra" => $data["fk_obra"],
+          "dia" => $data["dia"],
+        );        
+  
+        if ($this->Avance_model->actualizar_avance($dataInsert, $data["imagenes"]))
+        {
+          error_log("Avance Registrad");
+          $respuesta = array('error' => FALSE, 'msj' => "Avance Registrado");
+        }
+        else
+        {
+          error_log("Avance NO Registrado");
+          $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+        }
+      }
+      else
+      {
+        $dataInsert = array(
+          "fechCreacion" => date("Y-m-d H:i:s"),
+          "fechCreado" => date("Y-m-d H:i:s"),
+          "usuCreacion" => "Movíl",
+          "id" => NULL,
+          "avance" => NULL,
+          "semana" => $data["semana"],
+          "periodoInicial" => $data["fechInicial"],
+          // "periodoInicial" => date_format(date_create($data["periodoInicial"]), 'Y-m-d H:i:s'),
+          // "periodoFinal" => date_format(date_create($data["periodoFinal"]), 'Y-m-d H:i:s'),
+          "periodoFinal" => $data["fechFinal"],
+          "comentario" => $data["descripcion"],
+          "fk_obra" => $data["fk_obra"]  ,
+          "dia" => $data["dia"],
+        );        
+  
+        if ($this->Avance_model->registrar_avance($dataInsert, $data["imagenes"]))
+        {
+          error_log("Avance Registrad");
+          $respuesta = array('error' => FALSE, 'msj' => "Avance Registrado");
+        }
+        else
+        {
+          error_log("Avance NO Registrado");
+          $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+        }
+      }
+
+      $this->response($respuesta);
+      
     }
-
-    $this->response($respuesta);
-  }
-
     
+    public function fotos_post()
+    {
+      $data = $this->input->post();
+
+      error_log("WS Avance Campo Especifico");      
+      // error_log("fk_empleado: ".$data['fk_empleado']);
+
+      if(isset($data['campo']) && isset($data['valor']))
+      {
+        $data = $this->Avance_model->fotos(false, array($data['campo'] => $data['valor']));
+  
+        if (count($data) >= 0)
+        {
+          $respuesta = array('error' => FALSE, 'data' => $data);
+          $this->response($respuesta);
+        }
+        else
+        {
+          $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+          $this->response($respuesta);
+        }
+      }
+      else
+      {
+        $respuesta = array('error' => TRUE, 'msj' => "No fue posible recuperar listado de Avances por Cliente (Campos incompletos)!");
+        $this->response($respuesta);
+      }
+    }    
+
+    public function eliminar_avance_post()
+    {       
+      
+      $data = json_decode(file_get_contents('php://input'), true);
+
+      error_log("WS Avance Eliminar");    
+
+      if ($data['id'] != null)
+      {
+
+        $result = $this->Avance_model->eliminar_avance($data);
+
+        if ($result == true)
+        {
+          $respuesta = array('error' => FALSE, 'data' => $result);
+          $this->response($respuesta);
+        }
+        else
+        {
+          $respuesta = array('error' => TRUE, 'msj' => "Ocurrio un error inesperado en la aplicación, favor de contactar a soporte");
+          $this->response($respuesta);
+        }
+      }
+      else
+      {
+        $respuesta = array('error' => TRUE, 'msj' => "No fue posible eliminar el avance (Campos incompletos)!");
+        $this->response($respuesta);
+      }
+    }
 
     
 

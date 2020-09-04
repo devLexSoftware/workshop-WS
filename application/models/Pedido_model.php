@@ -5,7 +5,7 @@ class Pedido_model extends CI_Model
 {
   private $tabla = "pedidos";
   private $tabla2 = "obras";
-  // private $view = "vw_info_pedidos";
+  private $tabla3 = "pedidos_detalles";
 
   function __construct()
   {
@@ -14,6 +14,8 @@ class Pedido_model extends CI_Model
 
   public function select($json = false)
   {
+    $this->db->where("estatus",0);                
+
     $queryResult = $this->db->get($this->tabla);
     error_log($this->db->last_query());
 
@@ -65,6 +67,22 @@ class Pedido_model extends CI_Model
     if ($this->db->insert($this->tabla, $data))
     {
       error_log("INSERT PEDIDO: ".$this->db->last_query());
+      $insert_id = $this->db->insert_id();
+      
+      if($insert_id != null)
+      {
+        $dataDetalle = array(
+          "fechCreacion" => NULL,
+          "fechCreado" => NULL,
+          "usuCreacion" => "Movíl",
+          "id" => NULL,      
+          "estado" => $data['estado'],      
+          "fecha" => date("Y-m-d H:i:s"), 
+          "usuario" => "Movil",      
+          "fk_pedido" => $insert_id          
+        );
+        $this->db->insert($this->tabla3, $dataDetalle);
+      }
       return true;
     }
     else
@@ -80,8 +98,24 @@ class Pedido_model extends CI_Model
     $this->db->where('id',$data["id"]);
 
     if ($this->db->update($this->tabla, $data))
-    {
+    {      
       error_log("UPDATE PEDIDO: ".$this->db->last_query());
+      
+      if($data["id"] != null)
+      {
+        $dataDetalle = array(
+          "fechCreacion" => NULL, 
+          "fechCreado" => NULL, 
+          "usuCreacion" => "Movíl",
+          "id" => NULL,      
+          "estado" => $data['estado'],      
+          "fecha" => date("d-m-Y H:i:s"), 
+          "usuario" => "Movil",      
+          "fk_pedido" => $data["id"]          
+        );
+        $this->db->insert($this->tabla3, $dataDetalle);
+      }
+
       return true;
     }
     else
@@ -107,6 +141,62 @@ class Pedido_model extends CI_Model
       { return json_encode($queryResult->result()); }
       else
       { return $queryResult->result_array(); }
+    }
+  }
+
+  public function historial_campo_especifico($json = false, $params)
+  {
+    $queryResult = $this->db->get_where($this->tabla3, $params);
+    error_log($this->db->last_query());
+
+    if (!$queryResult)
+    {
+      error_log("ERROR SELECT PEDIDOS CAMPO ESPECIFICO");
+      return false;
+    }
+    else
+    {
+      if ($json)
+      { return json_encode($queryResult->result()); }
+      else
+      { return $queryResult->result_array(); }
+    }
+  }
+
+  public function borrar_historial($data)
+    {
+        error_log("BORRAR HISTORIAL");    
+
+        $this->db->where('fk_pedido', $data["id"]);
+
+        if ($this->db->delete($this->tabla3))
+        {
+            error_log("DELETE PEDIDO: ".$this->db->last_query());
+            return true;
+        }
+        else
+        {
+            error_log("DELETE PEDIDO: ".$this->db->last_query());
+            return false;
+        }
+    }
+
+  public function eliminar_pedido($data)
+  {
+    error_log("BORRAR PEDIDO");    
+    $result = $this->borrar_historial($data);
+
+    $this->db->where('id', $data["id"]);
+
+    if ($this->db->update('pedidos', $data))
+    {
+      error_log("UPDATE OBRA: ".$this->db->last_query());
+      return true;
+    }
+    else
+    {
+      error_log("UPDATE OBRA: ".$this->db->last_query());
+      return false;
     }
   }
 
